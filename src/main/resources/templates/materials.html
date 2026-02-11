@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layout :: html}">
+
+<head>
+    <title>原料管理</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <h2 class="mt-4">原料管理</h2>
+
+        <!-- Add Material Button Trigger Modal -->
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addMaterialModal"
+            sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+            <i class="bi bi-plus-circle"></i> 添加新原料
+        </button>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>当前库存</th>
+                        <th>单位</th>
+                        <th sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="m : ${materials}">
+                        <td th:text="${m.id}">1</td>
+                        <td th:text="${m.name}">大豆</td>
+                        <td th:text="${m.type}">原材料</td>
+                        <td>
+                            <span th:text="${m.currentStock}"
+                                th:class="${m.currentStock < 100} ? 'text-danger fw-bold' : ''">500</span>
+                        </td>
+                        <td th:text="${m.unit}">kg</td>
+                        <td sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                            <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                th:data-bs-target="'#stockInModal' + ${m.id}">入库</button>
+                            <a th:href="@{/materials/delete(id=${m.id})}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('确定删除吗?')">删除</a>
+
+                            <!-- Stock In Modal -->
+                            <div class="modal fade" th:id="'stockInModal' + ${m.id}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form th:action="@{/materials/addStock}" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">原料入库 - <span th:text="${m.name}"></span></h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="id" th:value="${m.id}">
+                                                <div class="mb-3">
+                                                    <label class="form-label">入库数量</label>
+                                                    <input type="number" step="0.01" name="quantity"
+                                                        class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">确认入库</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Material Modal -->
+        <div class="modal fade" id="addMaterialModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/materials/add}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">添加新原料</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">名称</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">类型</label>
+                                <select name="type" class="form-select">
+                                    <option value="原材料">原材料</option>
+                                    <option value="辅料">辅料</option>
+                                    <option value="包装材料">包装材料</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">单位</label>
+                                <input type="text" name="unit" class="form-control" placeholder="kg, 吨, 个..." required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">初始库存</label>
+                                <input type="number" step="0.01" name="currentStock" class="form-control" value="0">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

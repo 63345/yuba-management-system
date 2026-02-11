@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+
+<head>
+    <title>生产管理</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <h2 class="mt-4">生产管理</h2>
+
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}"></div>
+
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#startBatchModal">
+            <i class="bi bi-play-circle"></i> 开始新批次
+        </button>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>原料</th>
+                        <th>消耗量</th>
+                        <th>开始时间</th>
+                        <th>状态</th>
+                        <th>产出量</th>
+                        <th>等级</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${batches}">
+                        <td th:text="${b.batchCode}">BATCH-001</td>
+                        <td th:text="${b.materialUsed.name}">大豆</td>
+                        <td th:text="${b.materialQuantityUsed} + ' ' + ${b.materialUsed.unit}">50kg</td>
+                        <td th:text="${#temporals.format(b.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <span th:if="${b.status == 'PROCESSING'}" class="badge bg-warning text-dark">进行中</span>
+                            <span th:if="${b.status == 'COMPLETED'}" class="badge bg-success">已完成</span>
+                        </td>
+                        <td th:text="${b.quantityProduced}">-</td>
+                        <td th:text="${b.qualityGrade}">-</td>
+                        <td>
+                            <button th:if="${b.status == 'PROCESSING'}" class="btn btn-sm btn-success"
+                                data-bs-toggle="modal" th:data-bs-target="'#completeBatchModal' + ${b.id}">
+                                完成生产
+                            </button>
+
+                            <!-- Complete Batch Modal -->
+                            <div class="modal fade" th:id="'completeBatchModal' + ${b.id}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form th:action="@{/production/complete}" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">完成生产批次</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="batchId" th:value="${b.id}">
+                                                <div class="mb-3">
+                                                    <label class="form-label">产出数量 (kg)</label>
+                                                    <input type="number" step="0.01" name="outputQuantity"
+                                                        class="form-control" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">质量等级</label>
+                                                    <select name="qualityGrade" class="form-select">
+                                                        <option value="A">A级 (优)</option>
+                                                        <option value="B">B级 (良)</option>
+                                                        <option value="C">C级 (一般)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">确认完成</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Start Batch Modal -->
+        <div class="modal fade" id="startBatchModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/production/start}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">开始新生产批次</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">批次号</label>
+                                <input type="text" name="batchCode" class="form-control"
+                                    placeholder="例如: BATCH-20231027-01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">使用原料</label>
+                                <select name="materialId" class="form-select" required>
+                                    <option th:each="m : ${materials}" th:value="${m.id}"
+                                        th:text="${m.name} + ' (库存: ' + ${m.currentStock} + ' ' + ${m.unit} + ')'">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">消耗数量</label>
+                                <input type="number" step="0.01" name="materialQuantity" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">开始生产</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

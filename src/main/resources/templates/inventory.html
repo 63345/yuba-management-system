@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+
+<head>
+    <title>库存管理</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <h2 class="mt-4">库存管理 (成品)</h2>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>产品名称</th>
+                        <th>库存数量</th>
+                        <th>单位</th>
+                        <th>仓库位置</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${stocks}">
+                        <td th:text="${s.id}">1</td>
+                        <td th:text="${s.productName}">腐竹</td>
+                        <td th:text="${s.quantity}">100</td>
+                        <td th:text="${s.unit}">kg</td>
+                        <td th:text="${s.warehouseLocation}">主仓库</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

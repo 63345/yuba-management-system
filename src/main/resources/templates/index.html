@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+
+<head>
+    <title>仪表盘</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">仪表盘</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary">导出报表</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-header">原料库存</div>
+                    <div class="card-body">
+                        <h5 class="card-title">1,200 kg</h5>
+                        <p class="card-text">大豆库存充足</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-header">今日产量</div>
+                    <div class="card-body">
+                        <h5 class="card-title">300 kg</h5>
+                        <p class="card-text">腐竹生产中</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-header">待处理订单</div>
+                    <div class="card-body">
+                        <h5 class="card-title">5</h5>
+                        <p class="card-text">急需发货</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-header">库存预警</div>
+                    <div class="card-body">
+                        <h5 class="card-title">无</h5>
+                        <p class="card-text">系统状态良好</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>最近生产批次</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>原料</th>
+                        <th>开始时间</th>
+                        <th>状态</th>
+                        <th>产出</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BATCH-001</td>
+                        <td>一级大豆</td>
+                        <td>2023-10-27 08:00</td>
+                        <td><span class="badge bg-success">已完成</span></td>
+                        <td>200kg</td>
+                    </tr>
+                    <tr>
+                        <td>BATCH-002</td>
+                        <td>一级大豆</td>
+                        <td>2023-10-27 14:00</td>
+                        <td><span class="badge bg-warning text-dark">进行中</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

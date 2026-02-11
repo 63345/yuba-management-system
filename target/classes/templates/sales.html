@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layout :: html}">
+
+<head>
+    <title>销售管理</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <h2 class="mt-4">销售管理</h2>
+
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}"></div>
+
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createOrderModal">
+            <i class="bi bi-cart-plus"></i> 创建新订单
+        </button>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户名</th>
+                        <th>订单内容</th>
+                        <th>总金额</th>
+                        <th>下单时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="o : ${orders}">
+                        <td th:text="${o.id}">1</td>
+                        <td th:text="${o.customerName}">张三</td>
+                        <td th:text="${o.orderContent}">腐竹 10kg</td>
+                        <td th:text="${o.totalAmount}">500.00</td>
+                        <td th:text="${#temporals.format(o.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <span th:if="${o.status == 'PENDING'}" class="badge bg-warning text-dark">待发货</span>
+                            <span th:if="${o.status == 'SHIPPED'}" class="badge bg-success">已发货</span>
+                            <span th:if="${o.status == 'COMPLETED'}" class="badge bg-info">已完成</span>
+                            <span th:if="${o.status == 'CANCELLED'}" class="badge bg-secondary">已取消</span>
+                        </td>
+                        <td>
+                            <button th:if="${o.status == 'PENDING'}" class="btn btn-sm btn-primary"
+                                data-bs-toggle="modal" th:data-bs-target="'#shipOrderModal' + ${o.id}">
+                                发货
+                            </button>
+
+                            <!-- Ship Order Modal -->
+                            <div class="modal fade" th:id="'shipOrderModal' + ${o.id}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form th:action="@{/sales/ship}" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">订单发货</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="orderId" th:value="${o.id}">
+                                                <p>订单内容: <span th:text="${o.orderContent}"></span></p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">选择出库产品</label>
+                                                    <select name="productStockId" class="form-select">
+                                                        <option th:each="s : ${stocks}" th:value="${s.id}"
+                                                            th:text="${s.productName} + ' (库存: ' + ${s.quantity} + ')'">
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">出库数量</label>
+                                                    <input type="number" step="0.01" name="quantity"
+                                                        class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">确认发货</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Create Order Modal -->
+        <div class="modal fade" id="createOrderModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/sales/create}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">创建新订单</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">客户名称</label>
+                                <input type="text" name="customerName" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">订单内容描述</label>
+                                <textarea name="orderContent" class="form-control" rows="2"
+                                    placeholder="例如: 特级腐竹 50kg"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">总金额</label>
+                                <input type="number" step="0.01" name="totalAmount" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">创建订单</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
